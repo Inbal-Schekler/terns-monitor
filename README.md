@@ -98,53 +98,101 @@ The south camera (181) delivers HEVC from the NVR and is automatically transcode
 
 ## Step 1 — Video to Images — `ConvertVideoToImage/`
 
-**Notebook:** `run_video_converter_2025.ipynb`
+**Notebook:** `run_video_converter_2026.ipynb`
 
-Converts each scan video into a folder of images, one image per second per flag position, organized by tour.
+Converts each scan video into a folder of images — 8 images per flag position per tour — organized by camera, video, and tour.
 
-### How it works
+### How it works (2026)
 
-The converter uses a **time-based approach**: it reads the scan start time from the video filename, then skips through the video using calibrated timing values (dwell time per flag, camera movement time between flags). This replaced an older YOLO-based motion detection approach and is more reliable.
+The 2026 converter uses an **OCR + absolute seeking** approach, which replaced the older frame-counting approach that accumulated timing drift across flags.
+
+**Phase 1 — Find the scan start:**
+EasyOCR reads the timestamp overlay burned into the video frames. The converter seeks forward through the video until it finds the exact scan start time defined in `known_scan_start_times` (e.g. `10:01:44` for camera 181 morning). This gives a precise anchor point in the video file.
+
+**Phase 2 — Extract each flag independently:**
+Each flag is extracted by seeking directly to an absolute millisecond position:
+```
+flag_position = scan_start_ms + flag_index × flag_length × 1000
+```
+The first 3 seconds of each flag's window are skipped (camera settling time), and then 8 frames are saved — one per second. Because every flag seeks independently from the same anchor, there is **no drift accumulation** across flags. An error at flag 20 has zero effect on flag 21.
+
+**Two tours per video:**
+The second tour uses the same logic with an offset of `num_flags × flag_length + magin_between_tours` seconds added to the anchor.
 
 Each video produces:
 ```
-ImagesDir/
-└── atlitcam181.stream_2025_05_23_10_01_50/
+ImagesDir/2026/{camera_id}/{video_name}/
     ├── tour0/
-    │   ├── flag92_0_....jpg
+    │   ├── flag92_0_....jpg   ← 8 frames per flag (frame_0 to frame_7)
     │   ├── flag92_1_....jpg
     │   └── ...
     └── tour1/
         └── ...
 ```
 
-### Configuration — `tours_details.json`
+### Pre-flight gap check
 
-Before running, set the paths and verify the camera parameters in `tours_details.json`:
+Before converting, always run a gap check on all videos of the day. NVR recording gaps (brief network interruptions) cause the camera to miss part of its scan, making that day unusable for monitoring.
+
+In your Colab notebook, add this cell **before** the conversion loop:
+
+```python
+for date in dates:
+    result = subprocess.run(
+        f"python '{script_path}' --check {date.strip()}",
+        shell=True, capture_output=True, text=True
+    )
+    print(result.stdout)
+```
+
+The check samples 3 OSD timestamps from each video via OCR and compares them to the expected times. If any timestamp is more than 5 seconds off, a gap is reported. Note: FFprobe-based PTS analysis does **not** work here because the NVR records the video container continuously even during interruptions — the gap only appears in the OSD content.
+
+Output for a clean day:
+```
+Checking videos for 2026-05-04 ...
+  Checking [181] atlitcam181.stream_2026_05_04_10_01_30.mkv ... OK
+  Checking [181] atlitcam181.stream_2026_05_04_15_01_30.mkv ... OK
+  Checking [191] atlitcam191.stream_2026_05_04_09_59_50.mkv ... OK
+  Checking [191] atlitcam191.stream_2026_05_04_14_59_50.mkv ... OK
+
+  All videos complete — safe to convert to images.
+```
+
+Output for a day with a gap:
+```
+#######################################################
+#  WARNING: DO NOT USE 2026-04-30 FOR MONITORING  #
+#######################################################
+  Gap in: atlitcam181.stream_2026_04_30_10_01_30.mkv
+    -> at scan +345s: expected 10:07:29, got 10:07:40 (11s off)
+#######################################################
+```
+
+### Configuration — `tours_details.json`
 
 | Field | Description |
 |-------|-------------|
 | `videos_dir` | Path to downloaded scan videos |
 | `images_dir` | Output path for extracted images |
 | `flags_ids` | Ordered list of flag numbers visited in one scan pass |
-| `margin_till_1st_tour` | Seconds to skip at the start of the video before the first tour begins |
-| `magin_between_tours` | Seconds to skip in the video between tour 0 and tour 1 |
+| `flag_length` | Duration of each flag position in the scan (seconds, currently 15) |
+| `magin_between_tours` | Gap between tour 0 end and tour 1 start (seconds, currently 329 for camera 181) |
 
-> **Important:** `magin_between_tours` must match `GAP_BETWEEN_SCANS` in `run_scan.py` (currently 329 seconds). If you change the rest gap in the scan script, update this value too.
+> **Important:** `magin_between_tours` must match `GAP_BETWEEN_SCANS` in `run_scan.py`. If you change the rest gap in the scan script, update this value too.
 
-
-### Configuration -- `run_video_converter.ini`
-
-Before running, set the dates you want to process:
+### Configuration — `run_video_converter.ini`
 
 | Field | Description |
 |-------|-------------|
 | `dates` | Comma-separated list of dates to process, in `YYYY_MM_DD` format (e.g. `2026_04_30,2026_05_01`) |
+
 ### Running
 
-1. Open `ConvertVideoToImage/run_video_converter_2026.ipynb` (2026, OCR-based) or `run_video_converter_2025.ipynb` (2025, time-based) in Jupyter or Google Colab
-2. Update `videos_dir` and `images_dir` in `tours_details.json`
-3. Run all cells
+1. Open `ConvertVideoToImage/run_video_converter_2026.ipynb` in Google Colab
+2. Verify `videos_dir` and `images_dir` in `tours_details.json`
+3. Set the dates in `run_video_converter.ini`
+4. Run the gap check cell first — only proceed if all videos are clean
+5. Run the conversion cells
 
 ---
 
