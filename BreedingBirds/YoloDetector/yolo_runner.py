@@ -86,10 +86,12 @@ for start in range(0, len(images_list), images_chunk_size):
             'path': original_path
         }
 
+        os.makedirs(yolo_jsons_directory, exist_ok=True)
         with open(yolo_jsons_directory + "/" + file_name + ".json", "w") as file:
             json.dump(json_result, file)
 
         # Save annotated image with the correct flag-based filename
+        os.makedirs(yolo_images_directory, exist_ok=True)
         annotated = r.plot()  # returns BGR numpy array
         PILImage.fromarray(annotated[:, :, ::-1]).save(
             yolo_images_directory + "/" + file_name + ".jpg"
