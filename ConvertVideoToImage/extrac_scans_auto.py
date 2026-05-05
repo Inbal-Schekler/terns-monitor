@@ -93,11 +93,13 @@ for cam in cameras:
             # North camera (191) already arrives as H.264 from this NVR, so copy is enough for it.
             print("Fixing video (making it seekable)...")
             if cam["name"] == "181":
-                ffmpeg_command = [ffmpeg_path, "-i", temp_file,
+                ffmpeg_command = [ffmpeg_path, "-loglevel", "error",
+                                  "-i", temp_file,
                                   "-c:v", "libx264", "-crf", "18", "-preset", "fast",
                                   "-c:a", "copy", final_path]
             else:
-                ffmpeg_command = [ffmpeg_path, "-i", temp_file, "-c", "copy", final_path]
+                ffmpeg_command = [ffmpeg_path, "-loglevel", "error",
+                                  "-i", temp_file, "-c", "copy", final_path]
 
             try:
                 subprocess.run(ffmpeg_command, check=True)
