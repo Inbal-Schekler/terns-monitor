@@ -8,7 +8,7 @@ from iou_boxes_manager import iouBoxesManager
 from track_boxes_across_movies import TrackBoxesAcrossMovies
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.abspath(os.path.join(script_dir, os.pardir))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
 # Add the project root to the Python path
 sys.path.append(project_root)
 
