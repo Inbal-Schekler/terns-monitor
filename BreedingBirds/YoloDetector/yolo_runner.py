@@ -46,8 +46,9 @@ dir_utils.create_directory(results_dir_path)
 # Directories paths for the jsons and Images(with detection)
 yolo_jsons_directory = f'{results_dir_path}/Jsons'
 yolo_images_directory = f'{results_dir_path}/Images'
-# Create dir for jsons
+# Create dirs for jsons and images
 os.makedirs(yolo_jsons_directory)
+os.makedirs(yolo_images_directory)
 
 # Retrieve all JPG image file paths in the directory
 images_list = glob.glob(os.path.join(images_dir_path, "*.jpg"))
@@ -76,7 +77,7 @@ for start in range(0, len(images_list), images_chunk_size):
     images_chunk = images_list[start:end]
     
     # predict images chunk in YOLO model
-    results = model(images_chunk, show_conf=False, save=True, line_width=2, show_labels=False)
+    results = model(images_chunk, show_conf=False, save=False, line_width=2, show_labels=False)
     for r, original_path in zip(results, images_chunk):
         file_name = os.path.splitext(os.path.basename(original_path))[0]
         boxes = json.loads(r.to_json())
@@ -86,12 +87,10 @@ for start in range(0, len(images_list), images_chunk_size):
         }
 
         with open(yolo_jsons_directory + "/" + file_name + ".json", "w") as file:
-            # Write the JSON content to the file
             json.dump(json_result, file)
 
-source_dir = './runs/detect/predict'
-# Copy images directory to
-# shutil.copytree(source_dir, os.path.join(yolo_images_directory, 'Images'))
-shutil.copytree(source_dir, yolo_images_directory)
-# remove /run directory
-shutil.rmtree('./runs')
+        # Save annotated image with the correct flag-based filename
+        annotated = r.plot()  # returns BGR numpy array
+        PILImage.fromarray(annotated[:, :, ::-1]).save(
+            yolo_images_directory + "/" + file_name + ".jpg"
+        )
