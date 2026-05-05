@@ -47,8 +47,8 @@ dir_utils.create_directory(results_dir_path)
 yolo_jsons_directory = f'{results_dir_path}/Jsons'
 yolo_images_directory = f'{results_dir_path}/Images'
 # Create dirs for jsons and images
-os.makedirs(yolo_jsons_directory)
-os.makedirs(yolo_images_directory)
+os.makedirs(yolo_jsons_directory, exist_ok=True)
+os.makedirs(yolo_images_directory, exist_ok=True)
 
 # Retrieve all JPG image file paths in the directory
 images_list = glob.glob(os.path.join(images_dir_path, "*.jpg"))
