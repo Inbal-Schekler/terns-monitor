@@ -55,8 +55,8 @@ Right-click → *Run with PowerShell*. This registers two daily tasks:
 
 | Task | Trigger | What it does |
 |------|---------|--------------|
-| `TernScan_Morning` | 10:01 daily | Runs `run_scan.py` → full scan at 10:01:50 |
-| `TernScan_Afternoon` | 15:01 daily | Runs `run_scan.py` → full scan at 15:01:50 |
+| `TernScan_Morning` | 10:01 daily | Runs `run_scan_with_log.bat` → full scan at 10:01:50 |
+| `TernScan_Afternoon` | 15:01 daily | Runs `run_scan_with_log.bat` → full scan at 15:01:50 |
 
 `run_scan.py` controls the south camera (181) via ONVIF because we couldn't create scans on accurate times with the new south camera system from 2026. Each time it runs, it performs **two complete scan passes** with a 5.5-minute rest between them, so each video recording contains two extractable tours. The north camera (191) has its own internal schedule.
 
@@ -65,6 +65,12 @@ Right-click → *Run with PowerShell*. This registers two daily tasks:
 - Rest: 329 seconds (~5.5 min)
 - Pass 2 → same as Pass 1 ≈ 12 min
 - Total: ~38 minutes per session
+
+**Logging:** The tasks run via `run_scan_with_log.bat` (not `run_scan.py` directly), which appends a timestamped entry to:
+```
+F:\My Drive\tern_project\terns_movies\scan_log.txt
+```
+Check this file daily to confirm the scan ran. Each entry shows the start time, full script output, and a clear `SCAN COMPLETED OK` or `ERROR: SCAN FAILED` line.
 
 > **Note:** `new_camera.ini` must be present in `RealCoordinatesCalculator/` before running. See the Camera Connection section at the bottom.
 
@@ -78,7 +84,7 @@ Right-click → *Run with PowerShell*. This registers two daily tasks:
 | `TernsCameraDownload_1030` | 10:30 daily | Downloads yesterday's scans for both cameras |
 | `TernsCameraDownload_1530` | 15:30 daily | Same — catches any retries |
 
-**Script:** `extrac_scans_auto.py`
+**Script:** `extrac_scans_auto.py`, run via `run_tern_download.bat` (located at `C:\Users\user\`).
 
 Downloads scan videos from the NVR server (Nx Witness) for each camera:
 
@@ -93,6 +99,12 @@ F:\My Drive\tern_project\terns_movies\{year}\{camera_name}\
 ```
 
 The south camera (181) delivers HEVC from the NVR and is automatically transcoded to H.264 (using FFmpeg) so files are seekable and play on all software.
+
+**Logging:** `run_tern_download.bat` appends a timestamped entry to:
+```
+F:\My Drive\tern_project\terns_movies\download_log.txt
+```
+Each entry shows the start time, full download output, and a clear `DOWNLOAD COMPLETED OK` or `ERROR: DOWNLOAD FAILED` line. A copy of the bat file is kept in `ConvertVideoToImage/run_tern_download.bat` in this repo for reference.
 
 ---
 
