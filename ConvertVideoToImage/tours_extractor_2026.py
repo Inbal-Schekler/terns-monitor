@@ -32,8 +32,9 @@ def get_tour_details(video_path, tours_details):
     margin_till_1st_tour = specific_cam_details['margin_till_1st_tour']
     flags_to_shelve = specific_cam_details.get('flags_to_shelve', [])
     flag_length = specific_cam_details['flag_length']
+    settle_seconds = specific_cam_details.get('settle_seconds', 3)
 
-    return (flags_ids, tour_length, margin_till_1st_tour, magin_between_tours, flags_to_shelve, flag_length)
+    return (flags_ids, tour_length, margin_till_1st_tour, magin_between_tours, flags_to_shelve, flag_length, settle_seconds)
 
 
 def check_day_videos(date_str, videos_dir, tours_details):
@@ -130,7 +131,7 @@ if __name__ == '__main__':
     video_path = str(videos_dir / video_name)
 
     video_converter = VideoConverter()
-    (flags_ids, tour_length, margin_till_1st_tour, magin_between_tours, flags_to_shelve, flag_length) = \
+    (flags_ids, tour_length, margin_till_1st_tour, magin_between_tours, flags_to_shelve, flag_length, settle_seconds) = \
         get_tour_details(video_path, tour_configuration['tours_details'])
 
     if flags_ids is None or tour_length is None:
@@ -139,5 +140,5 @@ if __name__ == '__main__':
         exit()
 
     video_converter.convert_video(video_path, flags_ids, tour_length, magin_between_tours,
-                                  margin_till_1st_tour, flags_to_shelve, flag_length,
+                                  margin_till_1st_tour, flags_to_shelve, flag_length, settle_seconds,
                                   tour_configuration['images_dir'])

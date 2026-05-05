@@ -7,6 +7,7 @@
         "191": {
             "camera_id": 191,
             "flag_length": 15,
+            "settle_seconds": 6,
             "tour_length": 815,
             "margin_till_1st_tour": 1,
             "magin_between_tours": 48,
@@ -18,6 +19,7 @@
         "181": {
             "camera_id": 181,
             "flag_length": 15,
+            "settle_seconds": 3,
             "tour_length": 809,
             "margin_till_1st_tour": 1,
             "magin_between_tours": 329,

@@ -179,7 +179,7 @@ class VideoConverter:
         return False
 
     def convert_video(self, video_path, flags_ids, tour_length, magin_between_tours,
-                      margin_till_1st_tour, flags_to_shelve, flag_length, output_dir):
+                      margin_till_1st_tour, flags_to_shelve, flag_length, settle_seconds, output_dir):
         video = cv2.VideoCapture(video_path)
         fps = int(round(video.get(cv2.CAP_PROP_FPS)))
         print(f"Video FPS detected: {fps}")
@@ -201,7 +201,7 @@ class VideoConverter:
         scan_start_ms = video.get(cv2.CAP_PROP_POS_MSEC)
         print(f"Scan start position in video: {scan_start_ms/1000:.2f}s")
 
-        settle_seconds = 3   # skip first N seconds of each flag (camera settling)
+        print(f"Settle seconds: {settle_seconds}, frames per flag: 8")
         frames_per_flag = 8  # number of frames to capture per flag
 
         main_dir = f'{output_dir}/{camera_id}/{video_name}'
