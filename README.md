@@ -284,7 +284,7 @@ Classifies single-scan tracks. Uses YOLO outputs, track size (in cm), and locati
 
 **Step 5B: `BreedingBirds/TrackingTerns/track_breeding_terns_runner.ipynb`**
 
-Tracks terns across multiple scans. Breeding terns are identified by spatial fidelity — they return to the same location across scans.
+Tracks terns across multiple scans. Breeding terns are identified by spatial fidelity — they stay in the same location across scans.
 
 **Configuration:** `track_breeding_terns_runner.ini`
 
