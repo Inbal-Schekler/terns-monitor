@@ -110,7 +110,8 @@ Each entry shows the start time, full download output, and a clear `DOWNLOAD COM
 
 ## Step 1 — Video to Images — `ConvertVideoToImage/`
 
-**Notebook:** `run_video_converter_2026.ipynb`
+**Notebook:** `run_video_converter_2026.ipynb`  
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Inbal-Schekler/terns-monitor/blob/main/ConvertVideoToImage/run_video_converter_2026.ipynb)
 
 Converts each scan video into a folder of images — 8 images per flag position per tour — organized by camera, video, and tour.
 
@@ -210,7 +211,8 @@ Output for a day with a gap:
 
 ## Step 2 — YOLO Detection — `BreedingBirds/YoloDetector/`
 
-**Notebook:** `yolo_runner.ipynb`
+**Notebook:** `yolo_runner.ipynb`  
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Inbal-Schekler/terns-monitor/blob/main/BreedingBirds/YoloDetector/yolo_runner.ipynb)
 
 Runs a trained YOLOv8 model on the extracted images to detect terns. Results are saved per image for use in the tracking step.
 
@@ -227,7 +229,8 @@ Runs a trained YOLOv8 model on the extracted images to detect terns. Results are
 
 ## Step 3 — Single-Scan Tracking — `BreedingBirds/TrackingTerns/`
 
-**Notebook:** `track_scan_runner.ipynb`
+**Notebook:** `track_scan_runner.ipynb`  
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Inbal-Schekler/terns-monitor/blob/main/BreedingBirds/TrackingTerns/track_scan_runner.ipynb)
 
 Tracks individual terns across the images of one scan, linking detections into tracks.
 
@@ -282,7 +285,8 @@ Classifies single-scan tracks. Uses YOLO outputs, track size (in cm), and locati
 
 ---
 
-**Step 5B: `BreedingBirds/TrackingTerns/track_breeding_terns_runner.ipynb`**
+**Step 5B: `BreedingBirds/TrackingTerns/track_breeding_terns_runner.ipynb`**  
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Inbal-Schekler/terns-monitor/blob/main/BreedingBirds/TrackingTerns/track_breeding_terns_runner.ipynb)
 
 Tracks terns across multiple scans. Breeding terns are identified by spatial fidelity — they stay in the same location across scans.
 
@@ -298,7 +302,8 @@ Tracks terns across multiple scans. Breeding terns are identified by spatial fid
 
 ---
 
-**Step 6B: `BreedingBirds/FinalResults/report_breeding_terns.ipynb`**
+**Step 6B: `BreedingBirds/FinalResults/report_breeding_terns.ipynb`**  
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Inbal-Schekler/terns-monitor/blob/main/BreedingBirds/FinalResults/report_breeding_terns.ipynb)
 
 Classifies and counts breeding terns using multi-scan tracking data. Applies overlap correction between camera positions.
 
