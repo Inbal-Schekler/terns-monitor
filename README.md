@@ -8,6 +8,12 @@ For a detailed description of the methods and results, see our paper.
 
 ---
 
+## Before You Start
+
+> **Note for new users:** The "Open in Colab" buttons throughout this README open notebooks directly in Google Colab, but the notebooks cannot run standalone. They require the full folder structure to already be set up in your Google Drive, including the video files, trained model weights, camera credentials, and configuration files. Follow **Step 0** below to set everything up before running any notebook. Existing lab members with the Drive already configured can use the Colab buttons directly.
+
+---
+
 ## Repository Structure
 
 ```
