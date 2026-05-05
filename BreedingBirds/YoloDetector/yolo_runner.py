@@ -11,7 +11,7 @@ from ultralytics import YOLO
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.abspath(os.path.join(script_dir, os.pardir))
+project_root = os.path.abspath(os.path.join(script_dir, os.pardir, os.pardir))
 # Add the project root to the Python path
 sys.path.append(project_root)
 from Utilities.global_utils import GeneralUtils
@@ -51,8 +51,18 @@ os.makedirs(yolo_jsons_directory)
 
 # Retrieve all JPG image file paths in the directory
 images_list = glob.glob(os.path.join(images_dir_path, "*.jpg"))
-
 images_list = sorted(images_list, key=dir_utils.extract_flag_and_image_numbers)
+
+# Filter out corrupted images that PIL cannot open
+from PIL import Image as PILImage
+valid_images = []
+for img_path in images_list:
+    try:
+        PILImage.open(img_path).verify()
+        valid_images.append(img_path)
+    except Exception:
+        print(f"Skipping corrupted image: {os.path.basename(img_path)}")
+images_list = valid_images
 
 # Load a model
 model = YOLO(yolo_model_path)
@@ -67,13 +77,12 @@ for start in range(0, len(images_list), images_chunk_size):
     
     # predict images chunk in YOLO model
     results = model(images_chunk, show_conf=False, save=True, line_width=2, show_labels=False)
-    for r in results:
-        file_name = os.path.splitext(os.path.basename(r.path))[0]
-        boxes = json.loads(r.tojson())
-        # Get file name without extension
+    for r, original_path in zip(results, images_chunk):
+        file_name = os.path.splitext(os.path.basename(original_path))[0]
+        boxes = json.loads(r.to_json())
         json_result = {
             'predictions': boxes,
-            'path' : r.path
+            'path': original_path
         }
 
         with open(yolo_jsons_directory + "/" + file_name + ".json", "w") as file:
